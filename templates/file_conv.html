@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI-Powered File Converter</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>AI-Powered File Converter</h1>
+            <p>Convert your files effortlessly with AI-driven precision.</p>
+        </div>
+        <form action="/upload" method="post" enctype="multipart/form-data" class="upload-form">
+            <!-- Input File Selection -->
+            <div class="form-group">
+                <label for="input-file" class="file-label">
+                    <span class="file-icon">📂</span>
+                    <span class="file-text">Choose a file</span>
+                    <input type="file" name="file" id="input-file" 
+                           accept=".txt,.pdf,.docx,.html,.md,.epub,.odt,.rtf,.jpg,.png,.gif,.bmp,.webp,.tiff,.mp3,.wav,.ogg,.flac,.aac,.mp4,.avi,.mkv,.mov,.wmv,.flv,.zip,.tar,.gz,.7z,.pptx,.cdr,.ai,.psd,.svg" 
+                           required>
+                </label>
+            </div>
+
+            <!-- Input File Type Selection -->
+            <div class="form-group">
+                <label for="input-type">Input File Type</label>
+                <select name="input-type" id="input-type" class="custom-select" required>
+                    <option value="">--Select Input Type--</option>
+                    <option value="txt">Text (.txt)</option>
+                    <option value="pdf">PDF (.pdf)</option>
+                    <option value="docx">Word (.docx)</option>
+                    <option value="html">HTML (.html)</option>
+                    <option value="md">Markdown (.md)</option>
+                    <option value="epub">ePub (.epub)</option>
+                    <option value="odt">OpenDocument (.odt)</option>
+                    <option value="rtf">Rich Text (.rtf)</option>
+                    <option value="jpg">JPEG (.jpg)</option>
+                    <option value="png">PNG (.png)</option>
+                    <option value="gif">GIF (.gif)</option>
+                    <option value="bmp">BMP (.bmp)</option>
+                    <option value="webp">WebP (.webp)</option>
+                    <option value="tiff">TIFF (.tiff)</option>
+                    <option value="mp3">MP3 (.mp3)</option>
+                    <option value="wav">WAV (.wav)</option>
+                    <option value="ogg">OGG (.ogg)</option>
+                    <option value="flac">FLAC (.flac)</option>
+                    <option value="aac">AAC (.aac)</option>
+                    <option value="mp4">MP4 (.mp4)</option>
+                    <option value="avi">AVI (.avi)</option>
+                    <option value="mkv">MKV (.mkv)</option>
+                    <option value="mov">MOV (.mov)</option>
+                    <option value="wmv">WMV (.wmv)</option>
+                    <option value="flv">FLV (.flv)</option>
+                    <option value="zip">ZIP (.zip)</option>
+                    <option value="tar">TAR (.tar)</option>
+                    <option value="gz">GZ (.gz)</option>
+                    <option value="7z">7Z (.7z)</option>
+                    <option value="pptx">PowerPoint (.pptx)</option>
+                    <option value="cdr">CorelDRAW (.cdr)</option>
+                    <option value="ai">Adobe Illustrator (.ai)</option>
+                    <option value="psd">Photoshop (.psd)</option>
+                    <option value="svg">SVG (.svg)</option>
+                </select>
+            </div>
+
+            <!-- Output Format Selection -->
+            <div class="form-group">
+                <label for="output-format">Output Format</label>
+                <select name="format" id="output-format" class="custom-select" required>
+                    <option value="">--Select Output Format--</option>
+                </select>
+            </div>
+
+            <button type="submit" class="convert-button">Convert</button>
+        </form>
+    </div>
+
+    <!-- JavaScript for Dynamic Options -->
+    <script>
+        const inputTypeSelect = document.getElementById('input-type');
+        const outputFormatSelect = document.getElementById('output-format');
+
+        // Define convertible formats (matching backend dictionary)
+        const convertibleFormats = {
+            'txt': ['pdf', 'docx', 'html', 'md', 'epub', 'odt', 'rtf'],
+            'pdf': ['docx', 'txt', 'html', 'md', 'epub', 'odt', 'rtf', 'cdr'],
+            'docx': ['pdf', 'txt', 'html', 'md', 'epub', 'odt', 'rtf'],
+            'html': ['pdf', 'docx', 'txt', 'md', 'epub', 'odt', 'rtf'],
+            'md': ['pdf', 'docx', 'txt', 'html', 'epub', 'odt', 'rtf'],
+            'epub': ['pdf', 'docx', 'txt', 'html', 'md', 'odt', 'rtf'],
+            'odt': ['pdf', 'docx', 'txt', 'html', 'md', 'epub', 'rtf'],
+            'rtf': ['pdf', 'docx', 'txt', 'html', 'md', 'epub', 'odt'],
+
+            'jpg': ['png', 'gif', 'bmp', 'webp', 'tiff', 'cdr'],
+            'png': ['jpg', 'gif', 'bmp', 'webp', 'tiff', 'cdr'],
+            'gif': ['jpg', 'png', 'bmp', 'webp', 'tiff'],
+            'bmp': ['jpg', 'png', 'gif', 'webp', 'tiff'],
+            'webp': ['jpg', 'png', 'gif', 'bmp', 'tiff'],
+            'tiff': ['jpg', 'png', 'gif', 'bmp', 'webp'],
+
+            'mp3': ['wav', 'ogg', 'flac', 'aac'],
+            'wav': ['mp3', 'ogg', 'flac', 'aac'],
+            'ogg': ['mp3', 'wav', 'flac', 'aac'],
+            'flac': ['mp3', 'wav', 'ogg', 'aac'],
+            'aac': ['mp3', 'wav', 'ogg', 'flac'],
+
+            'mp4': ['avi', 'mkv', 'mov', 'wmv', 'flv'],
+            'avi': ['mp4', 'mkv', 'mov', 'wmv', 'flv'],
+            'mkv': ['mp4', 'avi', 'mov', 'wmv', 'flv'],
+            'mov': ['mp4', 'avi', 'mkv', 'wmv', 'flv'],
+            'wmv': ['mp4', 'avi', 'mkv', 'mov', 'flv'],
+            'flv': ['mp4', 'avi', 'mkv', 'mov', 'wmv'],
+
+            'zip': ['tar', 'gz', '7z'],
+            'tar': ['zip', 'gz', '7z'],
+            'gz': ['zip', 'tar', '7z'],
+            '7z': ['zip', 'tar', 'gz'],
+
+            'pptx': ['pdf', 'docx', 'txt', 'html'],
+            'cdr': ['pdf', 'png', 'svg'], // CDR to PDF, PNG, SVG
+            'ai': ['pdf', 'png', 'svg'], // AI to PDF, PNG, SVG
+            'psd': ['pdf', 'png', 'svg'], // PSD to PDF, PNG, SVG
+            'svg': ['pdf', 'png', 'cdr'] // SVG to PDF, PNG, CDR
+        };
+
+        // Update output format options based on input type selection
+        inputTypeSelect.addEventListener('change', () => {
+            const selectedInputType = inputTypeSelect.value;
+            const outputFormats = convertibleFormats[selectedInputType] || [];
+
+            // Clear existing options
+            outputFormatSelect.innerHTML = '<option value="">--Select Output Format--</option>';
+
+            // Add new options
+            outputFormats.forEach(format => {
+                const option = document.createElement('option');
+                option.value = format;
+                option.textContent = format.toUpperCase();
+                outputFormatSelect.appendChild(option);
+            });
+        });
+
+        // Auto-select input type based on file extension
+        document.getElementById('input-file').addEventListener('change', (event) => {
+            const fileName = event.target.files[0].name;
+            const fileExtension = fileName.split('.').pop().toLowerCase();
+            if (convertibleFormats[fileExtension]) {
+                inputTypeSelect.value = fileExtension;
+                inputTypeSelect.dispatchEvent(new Event('change')); // Trigger change event
+            }
+        });
+    </script>
+</body>
+</html>

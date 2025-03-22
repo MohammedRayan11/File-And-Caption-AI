@@ -1,0 +1,24 @@
+# Python cache files
+__pycache__/
+_pycache_/
+
+# Virtual environment
+ray/
+venv/
+.env/
+
+# Flask instance folder
+instance/
+
+# Uploaded and converted files
+uploads/
+converted/
+
+# System files
+.DS_Store
+.idea/
+.vscode/
+
+# Database files
+*.db
+*.sqlite3

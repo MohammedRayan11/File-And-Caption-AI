@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>File & Caption AI</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* Global Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #0f0f0f, #1e1e2f);
+            color: white;
+            overflow-x: hidden;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.5s ease, color 0.5s ease;
+        }
+
+        body.light-mode {
+            background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
+            color: #333;
+        }
+
+        /* Navigation Bar */
+        .navbar {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(15px);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+            position: fixed;
+            top: 0;
+            z-index: 1000;
+            transition: background 0.5s ease;
+        }
+
+        .navbar.light-mode {
+            background: rgba(255, 255, 255, 0.8);
+        }
+
+        .navbar .logo {
+            font-size: 1.8rem;
+            font-weight: 600;
+            background: linear-gradient(90deg, #32de84, #2cbfae);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-decoration: none;
+        }
+
+        .navbar .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .navbar .nav-links a {
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            font-size: 1rem;
+            transition: color 0.3s ease, transform 0.3s ease;
+        }
+
+        .navbar.light-mode .nav-links a {
+            color: rgba(0, 0, 0, 0.8);
+        }
+
+        .navbar .nav-links a:hover {
+            color: #32de84;
+            transform: translateY(-3px);
+        }
+
+        .theme-toggle {
+            background: none;
+            border: none;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .theme-toggle.light-mode {
+            color: rgba(0, 0, 0, 0.8);
+        }
+
+        .theme-toggle:hover {
+            color: #32de84;
+        }
+
+        /* Dashboard Container */
+        .dashboard-container {
+            padding: 6rem 2rem 2rem;
+            text-align: center;
+            max-width: 1200px;
+            width: 100%;
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            background: linear-gradient(90deg, #32de84, #2cbfae);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 1rem;
+            animation: fadeIn 1.5s ease-in-out;
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            color: rgba(255, 255, 255, 0.8);
+            animation: fadeIn 2s ease-in-out;
+        }
+
+        body.light-mode .header p {
+            color: rgba(0, 0, 0, 0.8);
+        }
+
+        /* Tool Grid */
+        .tool-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .tool-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 2rem;
+            cursor: pointer;
+            transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            animation: slideIn 0.8s ease-in-out;
+        }
+
+        body.light-mode .tool-card {
+            background: rgba(255, 255, 255, 0.8);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .tool-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        body.light-mode .tool-card:hover {
+            background: rgba(255, 255, 255, 0.9);
+        }
+
+        .tool-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: #32de84;
+            transition: color 0.3s ease;
+        }
+
+        .tool-card:hover .tool-icon {
+            color: #2cbfae;
+        }
+
+        .tool-card h2 {
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+            color: white;
+        }
+
+        body.light-mode .tool-card h2 {
+            color: #333;
+        }
+
+        .tool-card p {
+            font-size: 1rem;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        body.light-mode .tool-card p {
+            color: rgba(0, 0, 0, 0.8);
+        }
+
+        /* Footer */
+        .footer {
+            width: 100%;
+            padding: 1rem;
+            text-align: center;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            position: fixed;
+            bottom: 0;
+            transition: background 0.5s ease;
+        }
+
+        body.light-mode .footer {
+            background: rgba(255, 255, 255, 0.8);
+        }
+
+        .footer p {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        body.light-mode .footer p {
+            color: rgba(0, 0, 0, 0.8);
+        }
+
+        .footer a {
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        body.light-mode .footer a {
+            color: rgba(0, 0, 0, 0.8);
+        }
+
+        .footer a:hover {
+            color: #32de84;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes scaleIn {
+            0% {
+                transform: scale(0);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <a href="{{ url_for('dashboard') }}" class="logo">File & Caption AI</a>
+        <div class="nav-links">
+            <a href="{{ url_for('login') }}">Login</a>
+            <a href="{{ url_for('register') }}">Register</a>
+            <a href="{{ url_for('history') }}">History</a>
+            <button class="theme-toggle" onclick="toggleTheme()"><i class="fas fa-moon"></i></button>
+        </div>
+    </nav>
+
+    <!-- Dashboard Container -->
+    <div class="dashboard-container">
+        <!-- Header -->
+        <div class="header">
+            <h1>File & Caption AI</h1>
+            <p>Select a tool to get started.</p>
+        </div>
+
+        <!-- Tool Cards -->
+        <div class="tool-grid">
+            <!-- File Conversion Tool -->
+            <div class="tool-card" onclick="window.location.href='{{ url_for('file_conversion') }}'">
+                <div class="tool-icon"><i class="fas fa-file-alt"></i></div>
+                <h2>File Conversion</h2>
+                <p>Convert files between PDF, DOCX, TXT, PNG, JPG, SVG, etc.</p>
+            </div>
+
+            <!-- Video Captioning Tool -->
+            <div class="tool-card" onclick="window.location.href='{{ url_for('video_captioning') }}'">
+                <div class="tool-icon"><i class="fas fa-closed-captioning"></i></div>
+                <h2>Video Captioning</h2>
+                <p>Automatically add captions to your videos using AI.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>&copy; File & Caption AI. All rights reserved. | <a href="#">Privacy Policy</a> | <a href="#">Terms of Service</a></p>
+    </footer>
+
+    <script>
+        // Theme Toggle
+        function toggleTheme() {
+            const body = document.body;
+            const navbar = document.querySelector('.navbar');
+            const themeToggle = document.querySelector('.theme-toggle');
+            body.classList.toggle('light-mode');
+            navbar.classList.toggle('light-mode');
+            themeToggle.classList.toggle('light-mode');
+            const icon = themeToggle.querySelector('i');
+            if (body.classList.contains('light-mode')) {
+                icon.classList.remove('fa-moon');
+                icon.classList.add('fa-sun');
+            } else {
+                icon.classList.remove('fa-sun');
+                icon.classList.add('fa-moon');
+            }
+        }
+    </script>
+</body>
+</html>
