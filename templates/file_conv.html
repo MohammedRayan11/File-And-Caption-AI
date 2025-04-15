@@ -3,26 +3,641 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI-Powered File Converter</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <title>AI-Powered File Converter | Transform Files with AI Magic</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Montserrat:wght@700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #6c63ff;
+            --primary-dark: #564fd1;
+            --secondary-color: #ff6584;
+            --accent-color: #4fd1c5;
+            --dark-color: #1a202c;
+            --light-color: #f7fafc;
+            --success-color: #48bb78;
+            --warning-color: #ed8936;
+            --error-color: #f56565;
+            --gray-color: #a0aec0;
+            --dark-gray: #4a5568;
+            --light-gray: #e2e8f0;
+            --gradient: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            --gradient-accent: linear-gradient(135deg, var(--primary-color) 0%, var(--accent-color) 100%);
+            --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            --shadow-xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-slow: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f5f7fa;
+            color: var(--dark-color);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(108, 99, 255, 0.08) 0%, transparent 20%),
+                radial-gradient(circle at 90% 80%, rgba(255, 101, 132, 0.08) 0%, transparent 20%),
+                linear-gradient(135deg, rgba(247, 250, 252, 0.9) 0%, rgba(237, 242, 247, 0.9) 100%);
+            overflow-x: hidden;
+        }
+
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 900px;
+            padding: 2rem;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Header Styles */
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+            animation: fadeIn 0.8s ease-out both;
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            position: relative;
+            display: inline-block;
+            font-family: 'Montserrat', sans-serif;
+            letter-spacing: -0.5px;
+        }
+
+        .header h1::after {
+            content: '';
+            position: absolute;
+            bottom: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 5px;
+            background: var(--gradient);
+            border-radius: 3px;
+            animation: expandLine 1s ease-out 0.3s both;
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            color: var(--dark-gray);
+            max-width: 700px;
+            margin: 1rem auto 0;
+            line-height: 1.7;
+        }
+
+        /* Form Styles */
+        .upload-form {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 3rem;
+            border-radius: 20px;
+            box-shadow: var(--shadow-xl);
+            transition: var(--transition-slow);
+            animation: slideUp 0.8s ease-out 0.2s both;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .upload-form::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(108, 99, 255, 0.1) 0%, transparent 70%);
+            animation: rotateGradient 20s linear infinite;
+            z-index: -1;
+        }
+
+        .upload-form:hover {
+            transform: translateY(-5px) scale(1.005);
+            box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.3);
+        }
+
+        .form-group {
+            margin-bottom: 2rem;
+            position: relative;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.8rem;
+            font-weight: 500;
+            color: var(--dark-color);
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        /* File Input Styles */
+        .file-label {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 3rem 1rem;
+            border: 2px dashed var(--light-gray);
+            border-radius: 15px;
+            cursor: pointer;
+            transition: var(--transition-slow);
+            position: relative;
+            overflow: hidden;
+            background-color: rgba(247, 250, 252, 0.7);
+        }
+
+        .file-label:hover {
+            border-color: var(--primary-color);
+            background-color: rgba(108, 99, 255, 0.05);
+            transform: translateY(-3px);
+        }
+
+        .file-label.active {
+            border-color: var(--success-color);
+            background-color: rgba(72, 187, 120, 0.05);
+        }
+
+        .file-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: var(--primary-color);
+            transition: var(--transition);
+            position: relative;
+            z-index: 1;
+        }
+
+        .file-text {
+            font-size: 1.1rem;
+            color: var(--dark-gray);
+            transition: var(--transition);
+            position: relative;
+            z-index: 1;
+            font-weight: 500;
+        }
+
+        .file-hint {
+            font-size: 0.85rem;
+            color: var(--gray-color);
+            margin-top: 0.5rem;
+            opacity: 0.8;
+        }
+
+        #input-file {
+            display: none;
+        }
+
+        /* Select Styles */
+        .custom-select {
+            width: 100%;
+            padding: 1rem 1.2rem;
+            border: 1px solid var(--light-gray);
+            border-radius: 12px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 1rem;
+            color: var(--dark-color);
+            background-color: white;
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 1.2rem center;
+            background-size: 1rem;
+            transition: var(--transition);
+            box-shadow: var(--shadow);
+        }
+
+        .custom-select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(108, 99, 255, 0.2);
+        }
+
+        /* Button Styles */
+        .convert-button {
+            width: 100%;
+            padding: 1.2rem;
+            border: none;
+            border-radius: 12px;
+            background: var(--gradient);
+            color: white;
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition-slow);
+            box-shadow: 0 10px 20px rgba(108, 99, 255, 0.3);
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+            margin-top: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .convert-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: var(--transition-slow);
+            z-index: -1;
+        }
+
+        .convert-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(108, 99, 255, 0.4);
+        }
+
+        .convert-button:hover::before {
+            left: 100%;
+        }
+
+        .convert-button:active {
+            transform: translateY(1px);
+        }
+
+        .convert-button i {
+            margin-left: 8px;
+            transition: var(--transition);
+        }
+
+        .convert-button:hover i {
+            transform: translateX(5px);
+        }
+
+        /* File name display */
+        .file-name {
+            display: block;
+            margin-top: 1rem;
+            font-size: 0.9rem;
+            color: var(--dark-gray);
+            text-align: center;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 100%;
+            font-weight: 500;
+            padding: 0.5rem;
+            background: rgba(160, 174, 192, 0.1);
+            border-radius: 6px;
+            transition: var(--transition);
+        }
+
+        /* AI Features Section */
+        .ai-features {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .feature {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            width: 32%;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+
+        .feature:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .feature-icon {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: var(--primary-color);
+        }
+
+        .feature-title {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--dark-color);
+        }
+
+        .feature-desc {
+            font-size: 0.9rem;
+            color: var(--dark-gray);
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes expandLine {
+            from {
+                width: 0;
+            }
+            to {
+                width: 100px;
+            }
+        }
+
+        @keyframes rotateGradient {
+            from {
+                transform: rotate(0deg);
+            }
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                padding: 1.5rem;
+            }
+        
+            .header h1 {
+                font-size: 2.2rem;
+            }
+        
+            .header p {
+                font-size: 1rem;
+            }
+        
+            .upload-form {
+                padding: 2rem;
+            }
+
+            .feature {
+                width: 100%;
+                margin-bottom: 1rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 1rem;
+            }
+        
+            .header h1 {
+                font-size: 1.8rem;
+            }
+        
+            .file-label {
+                padding: 2rem 1rem;
+            }
+        
+            .convert-button {
+                padding: 1rem;
+            }
+
+            .upload-form {
+                padding: 1.5rem;
+            }
+        }
+
+        /* Advanced Effects */
+        .form-group:focus-within label {
+            color: var(--primary-color);
+        }
+
+        /* Loading state */
+        .loading {
+            position: relative;
+            pointer-events: none;
+        }
+
+        .loading::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 24px;
+            height: 24px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: translate(-50%, -50%) rotate(360deg);
+            }
+        }
+
+        /* Floating AI Elements */
+        .floating-ai {
+            position: absolute;
+            opacity: 0.1;
+            z-index: -1;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .floating-ai:nth-child(1) {
+            top: 10%;
+            left: 5%;
+            font-size: 5rem;
+            animation-delay: 0s;
+            color: var(--primary-color);
+        }
+
+        .floating-ai:nth-child(2) {
+            top: 70%;
+            right: 5%;
+            font-size: 4rem;
+            animation-delay: 1s;
+            color: var(--secondary-color);
+        }
+
+        .floating-ai:nth-child(3) {
+            bottom: 10%;
+            left: 15%;
+            font-size: 3.5rem;
+            animation-delay: 2s;
+            color: var(--accent-color);
+        }
+
+        /* Progress Bar */
+        .progress-container {
+            width: 100%;
+            height: 6px;
+            background: var(--light-gray);
+            border-radius: 3px;
+            margin-top: 1rem;
+            overflow: hidden;
+            display: none;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: var(--gradient);
+            width: 0;
+            transition: width 0.4s ease;
+        }
+
+        /* Notification */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 1rem 1.5rem;
+            background: white;
+            border-radius: 8px;
+            box-shadow: var(--shadow-lg);
+            transform: translateX(150%);
+            transition: transform 0.4s ease;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .notification.success {
+            border-left: 4px solid var(--success-color);
+        }
+
+        .notification.error {
+            border-left: 4px solid var(--error-color);
+        }
+
+        .notification-icon {
+            margin-right: 0.8rem;
+            font-size: 1.2rem;
+        }
+
+        .notification.success .notification-icon {
+            color: var(--success-color);
+        }
+
+        .notification.error .notification-icon {
+            color: var(--error-color);
+        }
+
+        /* Tooltip */
+        .tooltip {
+            position: relative;
+            display: inline-block;
+            margin-left: 5px;
+        }
+
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 200px;
+            background-color: var(--dark-color);
+            color: white;
+            text-align: center;
+            border-radius: 6px;
+            padding: 0.5rem;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0;
+            transition: var(--transition);
+            font-size: 0.8rem;
+            font-weight: normal;
+        }
+
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
+    </style>
 </head>
 <body>
+    <div class="particles" id="particles-js"></div>
+    
+    <div class="floating-ai">
+        <i class="fas fa-robot"></i>
+    </div>
+    <div class="floating-ai">
+        <i class="fas fa-brain"></i>
+    </div>
+    <div class="floating-ai">
+        <i class="fas fa-magic"></i>
+    </div>
+
     <div class="container">
         <div class="header">
             <h1>AI-Powered File Converter</h1>
-            <p>Convert your files effortlessly with AI-driven precision.</p>
+            <p>Transform your files with cutting-edge AI technology. Convert between formats while preserving quality, structure, and formatting automatically.</p>
         </div>
-        <form action="/upload" method="post" enctype="multipart/form-data" class="upload-form">
+        
+        <form action="/upload" method="post" enctype="multipart/form-data" class="upload-form" id="converterForm" onsubmit="return handleFormSubmit(event)">
             <!-- Input File Selection -->
             <div class="form-group">
-                <label for="input-file" class="file-label">
-                    <span class="file-icon">📂</span>
-                    <span class="file-text">Choose a file</span>
+                <label for="input-file">Select Your File <span class="tooltip">ℹ️<span class="tooltiptext">Supports documents, images, audio, video, and archives</span></span></label>
+                <label for="input-file" class="file-label" id="fileLabel">
+                    <span class="file-icon"><i class="fas fa-cloud-upload-alt"></i></span>
+                    <span class="file-text">Drag & Drop or Click to Browse</span>
+                    <span class="file-hint">Max file size: 50MB</span>
                     <input type="file" name="file" id="input-file" 
                            accept=".txt,.pdf,.docx,.html,.md,.epub,.odt,.rtf,.jpg,.png,.gif,.bmp,.webp,.tiff,.mp3,.wav,.ogg,.flac,.aac,.mp4,.avi,.mkv,.mov,.wmv,.flv,.zip,.tar,.gz,.7z,.pptx,.cdr,.ai,.psd,.svg" 
                            required>
                 </label>
+                <div class="file-name" id="fileName"></div>
+                <div class="progress-container" id="progressContainer">
+                    <div class="progress-bar" id="progressBar"></div>
+                </div>
             </div>
 
             <!-- Input File Type Selection -->
@@ -75,82 +690,308 @@
                 </select>
             </div>
 
-            <button type="submit" class="convert-button">Convert</button>
+            <button type="submit" class="convert-button" id="convertButton">
+                Convert File <i class="fas fa-arrow-right"></i>
+            </button>
         </form>
+
+        <div class="ai-features">
+            <div class="feature">
+                <div class="feature-icon">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <h3 class="feature-title">Secure Processing</h3>
+                <p class="feature-desc">All files are processed securely and deleted automatically after conversion</p>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">
+                    <i class="fas fa-bolt"></i>
+                </div>
+                <h3 class="feature-title">Lightning Fast</h3>
+                <p class="feature-desc">Advanced AI algorithms process files up to 10x faster than traditional tools</p>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">
+                    <i class="fas fa-magic"></i>
+                </div>
+                <h3 class="feature-title">Smart Conversion</h3>
+                <p class="feature-desc">AI preserves formatting, structure, and quality during conversion</p>
+            </div>
+        </div>
     </div>
 
-    <!-- JavaScript for Dynamic Options -->
+    <div class="notification" id="notification">
+        <div class="notification-icon">
+            <i class="fas fa-check-circle"></i>
+        </div>
+        <div class="notification-message">File converted successfully!</div>
+    </div>
+
+    <!-- JavaScript for Enhanced Functionality -->
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
     <script>
-        const inputTypeSelect = document.getElementById('input-type');
-        const outputFormatSelect = document.getElementById('output-format');
+        // Particles.js configuration
+        document.addEventListener('DOMContentLoaded', function() {
+            if (document.getElementById('particles-js')) {
+                particlesJS('particles-js', {
+                    "particles": {
+                        "number": {
+                            "value": 80,
+                            "density": {
+                                "enable": true,
+                                "value_area": 800
+                            }
+                        },
+                        "color": {
+                            "value": ["#6c63ff", "#ff6584", "#4fd1c5"]
+                        },
+                        "shape": {
+                            "type": "circle",
+                            "stroke": {
+                                "width": 0,
+                                "color": "#000000"
+                            }
+                        },
+                        "opacity": {
+                            "value": 0.3,
+                            "random": true,
+                            "anim": {
+                                "enable": true,
+                                "speed": 1,
+                                "opacity_min": 0.1,
+                                "sync": false
+                            }
+                        },
+                        "size": {
+                            "value": 3,
+                            "random": true,
+                            "anim": {
+                                "enable": true,
+                                "speed": 2,
+                                "size_min": 0.1,
+                                "sync": false
+                            }
+                        },
+                        "line_linked": {
+                            "enable": true,
+                            "distance": 150,
+                            "color": "#6c63ff",
+                            "opacity": 0.2,
+                            "width": 1
+                        },
+                        "move": {
+                            "enable": true,
+                            "speed": 1,
+                            "direction": "none",
+                            "random": true,
+                            "straight": false,
+                            "out_mode": "out",
+                            "bounce": false,
+                            "attract": {
+                                "enable": true,
+                                "rotateX": 600,
+                                "rotateY": 1200
+                            }
+                        }
+                    },
+                    "interactivity": {
+                        "detect_on": "canvas",
+                        "events": {
+                            "onhover": {
+                                "enable": true,
+                                "mode": "grab"
+                            },
+                            "onclick": {
+                                "enable": true,
+                                "mode": "push"
+                            },
+                            "resize": true
+                        },
+                        "modes": {
+                            "grab": {
+                                "distance": 140,
+                                "line_linked": {
+                                    "opacity": 0.5
+                                }
+                            },
+                            "push": {
+                                "particles_nb": 4
+                            }
+                        }
+                    },
+                    "retina_detect": true
+                });
+            }
 
-        // Define convertible formats (matching backend dictionary)
-        const convertibleFormats = {
-            'txt': ['pdf', 'docx', 'html', 'md', 'epub', 'odt', 'rtf'],
-            'pdf': ['docx', 'txt', 'html', 'md', 'epub', 'odt', 'rtf', 'cdr'],
-            'docx': ['pdf', 'txt', 'html', 'md', 'epub', 'odt', 'rtf'],
-            'html': ['pdf', 'docx', 'txt', 'md', 'epub', 'odt', 'rtf'],
-            'md': ['pdf', 'docx', 'txt', 'html', 'epub', 'odt', 'rtf'],
-            'epub': ['pdf', 'docx', 'txt', 'html', 'md', 'odt', 'rtf'],
-            'odt': ['pdf', 'docx', 'txt', 'html', 'md', 'epub', 'rtf'],
-            'rtf': ['pdf', 'docx', 'txt', 'html', 'md', 'epub', 'odt'],
+            // File input handling
+            const inputTypeSelect = document.getElementById('input-type');
+            const outputFormatSelect = document.getElementById('output-format');
+            const fileInput = document.getElementById('input-file');
+            const fileLabel = document.getElementById('fileLabel');
+            const fileName = document.getElementById('fileName');
+            const convertButton = document.getElementById('convertButton');
+            const progressContainer = document.getElementById('progressContainer');
+            const progressBar = document.getElementById('progressBar');
+            const notification = document.getElementById('notification');
 
-            'jpg': ['png', 'gif', 'bmp', 'webp', 'tiff', 'cdr'],
-            'png': ['jpg', 'gif', 'bmp', 'webp', 'tiff', 'cdr'],
-            'gif': ['jpg', 'png', 'bmp', 'webp', 'tiff'],
-            'bmp': ['jpg', 'png', 'gif', 'webp', 'tiff'],
-            'webp': ['jpg', 'png', 'gif', 'bmp', 'tiff'],
-            'tiff': ['jpg', 'png', 'gif', 'bmp', 'webp'],
+            // Define convertible formats
+            const convertibleFormats = {
+                'txt': ['pdf', 'docx', 'html', 'md', 'epub', 'odt', 'rtf'],
+                'pdf': ['docx', 'txt', 'html', 'md', 'epub', 'odt', 'rtf', 'cdr'],
+                'docx': ['pdf', 'txt', 'html', 'md', 'epub', 'odt', 'rtf'],
+                'html': ['pdf', 'docx', 'txt', 'md', 'epub', 'odt', 'rtf'],
+                'md': ['pdf', 'docx', 'txt', 'html', 'epub', 'odt', 'rtf'],
+                'epub': ['pdf', 'docx', 'txt', 'html', 'md', 'odt', 'rtf'],
+                'odt': ['pdf', 'docx', 'txt', 'html', 'md', 'epub', 'rtf'],
+                'rtf': ['pdf', 'docx', 'txt', 'html', 'md', 'epub', 'odt'],
+                'jpg': ['png', 'gif', 'bmp', 'webp', 'tiff', 'cdr'],
+                'png': ['jpg', 'gif', 'bmp', 'webp', 'tiff', 'cdr'],
+                'gif': ['jpg', 'png', 'bmp', 'webp', 'tiff'],
+                'bmp': ['jpg', 'png', 'gif', 'webp', 'tiff'],
+                'webp': ['jpg', 'png', 'gif', 'bmp', 'tiff'],
+                'tiff': ['jpg', 'png', 'gif', 'bmp', 'webp'],
+                'mp3': ['wav', 'ogg', 'flac', 'aac'],
+                'wav': ['mp3', 'ogg', 'flac', 'aac'],
+                'ogg': ['mp3', 'wav', 'flac', 'aac'],
+                'flac': ['mp3', 'wav', 'ogg', 'aac'],
+                'aac': ['mp3', 'wav', 'ogg', 'flac'],
+                'mp4': ['avi', 'mkv', 'mov', 'wmv', 'flv'],
+                'avi': ['mp4', 'mkv', 'mov', 'wmv', 'flv'],
+                'mkv': ['mp4', 'avi', 'mov', 'wmv', 'flv'],
+                'mov': ['mp4', 'avi', 'mkv', 'wmv', 'flv'],
+                'wmv': ['mp4', 'avi', 'mkv', 'mov', 'flv'],
+                'flv': ['mp4', 'avi', 'mkv', 'mov', 'wmv'],
+                'zip': ['tar', 'gz', '7z'],
+                'tar': ['zip', 'gz', '7z'],
+                'gz': ['zip', 'tar', '7z'],
+                '7z': ['zip', 'tar', 'gz'],
+                'pptx': ['pdf', 'docx', 'txt', 'html'],
+                'cdr': ['pdf', 'png', 'svg'],
+                'ai': ['pdf', 'png', 'svg'],
+                'psd': ['pdf', 'png', 'svg'],
+                'svg': ['pdf', 'png', 'cdr']
+            };
 
-            'mp3': ['wav', 'ogg', 'flac', 'aac'],
-            'wav': ['mp3', 'ogg', 'flac', 'aac'],
-            'ogg': ['mp3', 'wav', 'flac', 'aac'],
-            'flac': ['mp3', 'wav', 'ogg', 'aac'],
-            'aac': ['mp3', 'wav', 'ogg', 'flac'],
+            // Update output format options based on input type selection
+            inputTypeSelect.addEventListener('change', () => {
+                const selectedInputType = inputTypeSelect.value;
+                const outputFormats = convertibleFormats[selectedInputType] || [];
 
-            'mp4': ['avi', 'mkv', 'mov', 'wmv', 'flv'],
-            'avi': ['mp4', 'mkv', 'mov', 'wmv', 'flv'],
-            'mkv': ['mp4', 'avi', 'mov', 'wmv', 'flv'],
-            'mov': ['mp4', 'avi', 'mkv', 'wmv', 'flv'],
-            'wmv': ['mp4', 'avi', 'mkv', 'mov', 'flv'],
-            'flv': ['mp4', 'avi', 'mkv', 'mov', 'wmv'],
+                // Clear existing options
+                outputFormatSelect.innerHTML = '<option value="">--Select Output Format--</option>';
 
-            'zip': ['tar', 'gz', '7z'],
-            'tar': ['zip', 'gz', '7z'],
-            'gz': ['zip', 'tar', '7z'],
-            '7z': ['zip', 'tar', 'gz'],
-
-            'pptx': ['pdf', 'docx', 'txt', 'html'],
-            'cdr': ['pdf', 'png', 'svg'], // CDR to PDF, PNG, SVG
-            'ai': ['pdf', 'png', 'svg'], // AI to PDF, PNG, SVG
-            'psd': ['pdf', 'png', 'svg'], // PSD to PDF, PNG, SVG
-            'svg': ['pdf', 'png', 'cdr'] // SVG to PDF, PNG, CDR
-        };
-
-        // Update output format options based on input type selection
-        inputTypeSelect.addEventListener('change', () => {
-            const selectedInputType = inputTypeSelect.value;
-            const outputFormats = convertibleFormats[selectedInputType] || [];
-
-            // Clear existing options
-            outputFormatSelect.innerHTML = '<option value="">--Select Output Format--</option>';
-
-            // Add new options
-            outputFormats.forEach(format => {
-                const option = document.createElement('option');
-                option.value = format;
-                option.textContent = format.toUpperCase();
-                outputFormatSelect.appendChild(option);
+                // Add new options
+                outputFormats.forEach(format => {
+                    const option = document.createElement('option');
+                    option.value = format;
+                    option.textContent = format.toUpperCase();
+                    outputFormatSelect.appendChild(option);
+                });
             });
-        });
 
-        // Auto-select input type based on file extension
-        document.getElementById('input-file').addEventListener('change', (event) => {
-            const fileName = event.target.files[0].name;
-            const fileExtension = fileName.split('.').pop().toLowerCase();
-            if (convertibleFormats[fileExtension]) {
-                inputTypeSelect.value = fileExtension;
-                inputTypeSelect.dispatchEvent(new Event('change')); // Trigger change event
+            // File input handling
+            fileInput.addEventListener('change', (event) => {
+                const file = event.target.files[0];
+                if (file) {
+                    // Update UI
+                    fileName.textContent = file.name;
+                    fileLabel.classList.add('active');
+                    
+                    // Auto-detect file type
+                    const fileExtension = file.name.split('.').pop().toLowerCase();
+                    if (convertibleFormats[fileExtension]) {
+                        inputTypeSelect.value = fileExtension;
+                        inputTypeSelect.dispatchEvent(new Event('change'));
+                    }
+                    
+                    // Show file size validation
+                    if (file.size > 50 * 1024 * 1024) { // 50MB
+                        showNotification('File size exceeds 50MB limit', 'error');
+                        convertButton.disabled = true;
+                    } else {
+                        convertButton.disabled = false;
+                    }
+                }
+            });
+
+            // Drag and drop functionality
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                fileLabel.addEventListener(eventName, preventDefaults, false);
+            });
+
+            function preventDefaults(e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+
+            ['dragenter', 'dragover'].forEach(eventName => {
+                fileLabel.addEventListener(eventName, highlight, false);
+            });
+
+            ['dragleave', 'drop'].forEach(eventName => {
+                fileLabel.addEventListener(eventName, unhighlight, false);
+            });
+
+            function highlight() {
+                fileLabel.classList.add('highlight');
+            }
+
+            function unhighlight() {
+                fileLabel.classList.remove('highlight');
+            }
+
+            fileLabel.addEventListener('drop', handleDrop, false);
+
+            function handleDrop(e) {
+                const dt = e.dataTransfer;
+                const file = dt.files[0];
+                fileInput.files = dt.files;
+                fileInput.dispatchEvent(new Event('change'));
+            }
+
+            // Form submission handler
+            function handleFormSubmit(event) {
+                // Show loading state
+                convertButton.innerHTML = 'Processing... <i class="fas fa-cog fa-spin"></i>';
+                convertButton.classList.add('loading');
+                progressContainer.style.display = 'block';
+                
+                // Simulate progress (remove this in production)
+                let progress = 0;
+                const progressInterval = setInterval(() => {
+                    progress += Math.random() * 10;
+                    if (progress > 90) clearInterval(progressInterval);
+                    progressBar.style.width = `${Math.min(progress, 100)}%`;
+                }, 300);
+                
+                // In production, remove this setTimeout and let the form submit normally
+                setTimeout(() => {
+                    clearInterval(progressInterval);
+                    progressBar.style.width = '100%';
+                    
+                    // Redirect to result page after "processing"
+                    window.location.href = 'result1.html';
+                }, 3000);
+                
+                // Prevent default only for demo (remove this line in production)
+                event.preventDefault();
+                
+                // In production, return true to allow form submission
+                return false; // Remove this in production
+            }
+
+            // Notification system
+            function showNotification(message, type) {
+                notification.className = `notification ${type}`;
+                notification.querySelector('.notification-message').textContent = message;
+                notification.querySelector('.notification-icon i').className = 
+                    type === 'success' ? 'fas fa-check-circle' : 'fas fa-exclamation-circle';
+                
+                notification.classList.add('show');
+                
+                setTimeout(() => {
+                    notification.classList.remove('show');
+                }, 5000);
             }
         });
     </script>

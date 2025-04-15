@@ -209,13 +209,23 @@ def video_captioning():
 
             output_filename = f"captioned_{filename}"
             output_path = os.path.join(app.config['CONVERTED_FOLDER'], output_filename)
-            thread = threading.Thread(
-                target=process_video,
-                args=(filepath, output_path, dest_language, text_style, text_size, text_position, text_color)
-            )
-            thread.start()
-
-            return jsonify({"message": "Video processing started", "filename": output_filename}), 200
+            
+            try:
+                # Process the video synchronously (for simplicity)
+                process_video(filepath, output_path, dest_language, text_style, text_size, text_position, text_color)
+                
+                # Return success response with the filename
+                return jsonify({
+                    "success": True,
+                    "filename": output_filename,
+                    "message": "Video processing completed successfully"
+                }), 200
+            except Exception as e:
+                logging.error(f"Error processing video: {e}")
+                return jsonify({
+                    "error": str(e),
+                    "message": "Error processing video"
+                }), 500
         else:
             return jsonify({"error": "File type not allowed"}), 400
 

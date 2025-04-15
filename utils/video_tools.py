@@ -53,9 +53,13 @@ LANGUAGE_TOOL_CODES = {
 def extract_audio(video_path, audio_path):
     """Extract audio from a video using MoviePy."""
     try:
+        # Ensure the output directory exists
+        os.makedirs(os.path.dirname(audio_path), exist_ok=True)
+        
         video = mp.VideoFileClip(video_path)
-        video.audio.write_audiofile(audio_path, logger=None)  # Disable logging for speed
+        video.audio.write_audiofile(audio_path, logger=None)
         logging.info(f"Audio extracted and saved to {audio_path}")
+        return True
     except Exception as e:
         logging.error(f"Error extracting audio: {e}")
         raise
@@ -240,7 +244,11 @@ def add_captions_to_video(video_path, captions, output_path, font_path=FONT_PATH
 def process_video(video_path, output_path, dest_language=None, text_style="arial", text_size="24", text_position="bottom", text_color="#ffffff"):
     """Process a video to generate captions and update it."""
     try:
-        audio_path = "temp_audio.wav"
+        # Create temp directory if it doesn't exist
+        temp_dir = "temp"
+        os.makedirs(temp_dir, exist_ok=True)
+        
+        audio_path = os.path.join(temp_dir, "temp_audio.wav")
         extract_audio(video_path, audio_path)
 
         transcription = transcribe_audio(audio_path)
@@ -254,14 +262,17 @@ def process_video(video_path, output_path, dest_language=None, text_style="arial
             video_path,
             captions,
             output_path,
-            font_path=FONT_PATH,  # Default font path
-            font_size=int(text_size),  # Convert text size to integer
-            text_color=text_color,  # Use selected text color
-            bg_color=BG_COLOR,  # Default background color
-            text_style=text_style,  # Use selected text style
-            text_position=text_position  # Use selected text position
+            font_path=FONT_PATH,
+            font_size=int(text_size),
+            text_color=text_color,
+            bg_color=BG_COLOR,
+            text_style=text_style,
+            text_position=text_position
         )
 
-        os.remove(audio_path)
+        # Clean up temporary files
+        if os.path.exists(audio_path):
+            os.remove(audio_path)
     except Exception as e:
         logging.error(f"Error processing video: {e}")
+        raise

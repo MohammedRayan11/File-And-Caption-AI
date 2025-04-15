@@ -248,7 +248,7 @@
 <body>
     <div class="container">
         <h1>Advanced Video Captioning</h1>
-        <form id="upload-form" method="POST" enctype="multipart/form-data">
+        <form id="upload-form" method="POST" enctype="multipart/form-data" action="/video_captioning">
             <div class="upload-box">
                 <input type="file" name="file" id="file" accept="video/*" required>
                 <label for="file">
@@ -290,7 +290,7 @@
             </div>
             <div class="text-style-select" id="text-style-select">
                 <label for="text-style">Select Text Style:</label>
-                <select id="text-style" name="text-style">
+                <select id="text-style" name="text_style">
                     <option value="arial">Arial</option>
                     <option value="times">Times New Roman</option>
                     <option value="courier">Courier</option>
@@ -300,7 +300,7 @@
             </div>
             <div class="text-size-select" id="text-size-select">
                 <label for="text-size">Select Text Size:</label>
-                <select id="text-size" name="text-size">
+                <select id="text-size" name="text_size">
                     <option value="20">20px</option>
                     <option value="24">24px</option>
                     <option value="28">28px</option>
@@ -310,7 +310,7 @@
             </div>
             <div class="text-position-select" id="text-position-select">
                 <label for="text-position">Select Text Position:</label>
-                <select id="text-position" name="text-position">
+                <select id="text-position" name="text_position">
                     <option value="top">Top</option>
                     <option value="bottom">Bottom</option>
                     <option value="center">Center</option>
@@ -318,7 +318,7 @@
             </div>
             <div class="text-color-select" id="text-color-select">
                 <label for="text-color">Select Text Color:</label>
-                <input type="color" id="text-color" name="text-color" value="#ffffff">
+                <input type="color" id="text-color" name="text_color" value="#ffffff">
             </div>
             <div class="video-preview">
                 <video controls></video>
@@ -326,7 +326,7 @@
             <div class="progress-bar-container">
                 <div class="progress-bar"></div>
             </div>
-            <button type="submit">Upload and Add Captions</button>
+            <button type="submit" id="submit-button">Upload and Add Captions</button>
         </form>
     </div>
 
@@ -346,53 +346,15 @@
         const textSizeSelect = document.getElementById('text-size-select');
         const textPositionSelect = document.getElementById('text-position-select');
         const textColorSelect = document.getElementById('text-color-select');
+        const submitButton = document.getElementById('submit-button');
 
-        // Handle file upload and processing
-        uploadForm.addEventListener('submit', async (e) => {
-            e.preventDefault(); // Prevent default form submission
-
-            const formData = new FormData(uploadForm); // Create FormData object from the form
-
-            // Show progress bar
-            progressBarContainer.style.display = 'block';
-
-            try {
-                const response = await fetch('/video_captioning', {
-                    method: 'POST',
-                    body: formData, // Send form data
-                });
-
-                if (response.ok) {
-                    const data = await response.json();
-                    const filename = data.filename;
-
-                    // Poll progress every second
-                    const interval = setInterval(async () => {
-                        const progressResponse = await fetch('/progress');
-                        const progressData = await progressResponse.json();
-                        const progress = progressData.progress;
-
-                        // Update progress bar
-                        progressBar.style.width = `${progress}%`;
-
-                        // If processing is complete, stop polling and redirect to result page
-                        if (progress >= 100) {
-                            clearInterval(interval);
-                            progressBarContainer.style.display = 'none';
-
-                            // Redirect to result page
-                            window.location.href = `/result/${filename}`;
-                        }
-                    }, 1000); // Poll every second
-                } else {
-                    const errorData = await response.json();
-                    alert(`Error: ${errorData.error}`);
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                alert('An error occurred while uploading the file.');
-            }
-        });
+        // Initially hide options
+        languageSelect.style.display = 'none';
+        textStyleSelect.style.display = 'none';
+        textSizeSelect.style.display = 'none';
+        textPositionSelect.style.display = 'none';
+        textColorSelect.style.display = 'none';
+        progressBarContainer.style.display = 'none';
 
         // Handle file preview
         fileInput.addEventListener('change', (e) => {
@@ -402,6 +364,7 @@
                 reader.onload = (e) => {
                     previewVideo.src = e.target.result;
                     videoPreview.style.display = 'block';
+                    // Show options after file is selected
                     languageSelect.style.display = 'block';
                     textStyleSelect.style.display = 'block';
                     textSizeSelect.style.display = 'block';
@@ -409,6 +372,48 @@
                     textColorSelect.style.display = 'block';
                 };
                 reader.readAsDataURL(file);
+            }
+        });
+
+        // Handle form submission
+        // Handle form submission
+        uploadForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const formData = new FormData(uploadForm);
+            
+            // Show progress bar and loading state
+            progressBarContainer.style.display = 'block';
+            submitButton.disabled = true;
+            submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+            
+            try {
+                const response = await fetch('/video_captioning', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    if (result.success) {
+                        // Show success message
+                        alert('Video processing completed successfully!');
+                        // Redirect to result page with the filename
+                        window.location.href = `/result/${result.filename}`;
+                    } else {
+                        alert(`Error: ${result.message || 'Unknown error occurred'}`);
+                    }
+                } else {
+                    alert(`Error: ${result.error || 'Server error occurred'}`);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('An error occurred while processing the video.');
+            } finally {
+                submitButton.disabled = false;
+                submitButton.innerHTML = 'Upload and Add Captions';
+                progressBarContainer.style.display = 'none';
             }
         });
 
