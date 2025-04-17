@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        .admin-container {
+            padding: 6rem 2rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 1rem;
+            text-align: center;
+        }
+        
+        .stat-card h3 {
+            color: #32de84;
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-card p {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+        
+        th, td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        th {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .admin-badge {
+            background: #32de84;
+            color: white;
+            padding: 0.2rem 0.5rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+        }
+        
+        .btn {
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            text-decoration: none;
+            display: inline-block;
+            margin-right: 0.5rem;
+            font-size: 0.9rem;
+        }
+        
+        .btn-primary {
+            background: #32de84;
+            color: white;
+        }
+        
+        .btn-danger {
+            background: #ff4d4d;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <a href="{{ url_for('dashboard') }}" class="logo">Admin Dashboard</a>
+        <div class="nav-links">
+            <a href="{{ url_for('dashboard') }}"><i class="fas fa-arrow-left"></i> Back to Dashboard</a>
+            <a href="{{ url_for('logout') }}">Logout</a>
+        </div>
+    </nav>
+
+    <div class="admin-container">
+        <h1>Admin Dashboard</h1>
+        <p>System overview and user management</p>
+        
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h3>Total Users</h3>
+                <p>{{ users|length }}</p>
+            </div>
+            <div class="stat-card">
+                <h3>Total Conversions</h3>
+                <p>{{ total_conversions }}</p>
+            </div>
+            <div class="stat-card">
+                <h3>Admin Users</h3>
+                <p>{{ users|selectattr('is_admin')|list|length }}</p>
+            </div>
+        </div>
+        
+        <h2>User Management</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Username</th>
+                    <th>Conversions</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in users %}
+                <tr>
+                    <td>{{ user.id }}</td>
+                    <td>{{ user.username }}</td>
+                    <td>{{ user.files|length }}</td>
+                    <td>
+                        {% if user.is_admin %}
+                        <span class="admin-badge">Admin</span>
+                        {% else %}
+                        User
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if not user.is_admin %}
+                        <a href="{{ url_for('make_admin', user_id=user.id) }}" class="btn btn-primary">Make Admin</a>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        
+        <h2 style="margin-top: 2rem;">Recent Activity</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>User</th>
+                    <th>Operation</th>
+                    <th>File</th>
+                    <th>Time</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for activity in recent_activity %}
+                <tr>
+                    <td>{{ activity.user.username }}</td>
+                    <td>{{ activity.operation }}</td>
+                    <td>{{ activity.filename }}</td>
+                    <td>{{ activity.timestamp.strftime('%Y-%m-%d %H:%M') }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        // Confirm before making admin
+        document.querySelectorAll('a[href*="make_admin"]').forEach(link => {
+            link.addEventListener('click', function(e) {
+                if (!confirm('Are you sure you want to make this user an admin?')) {
+                    e.preventDefault();
+                }
+            });
+        });
+    </script>
+</body>
+</html>

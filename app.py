@@ -20,7 +20,7 @@ app.secret_key = 'supersecretkey'
 app.config['UPLOAD_FOLDER'] = 'uploads'
 app.config['CONVERTED_FOLDER'] = 'converted'
 app.config['ALLOWED_EXTENSIONS'] = {'txt', 'pdf', 'doc', 'docx', 'jpg', 'png', 'mp3', 'mp4', 'pptx', 'cdr', 'ai', 'psd', 'svg', 'mov', 'avi'}
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////var/lib/your-app/site.db'  # Persistent database location
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 # Initialize database
@@ -101,7 +101,8 @@ def register():
 def dashboard():
     if 'user_id' not in session:
         return redirect(url_for('login'))
-    return render_template('dashboard.html')
+    current_user = User.query.get(session['user_id'])
+    return render_template('dashboard.html', current_user=current_user)
 
 @app.route('/file_conversion')
 def file_conversion():
