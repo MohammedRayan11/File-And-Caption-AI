@@ -1,101 +1,110 @@
-📁 Smart File & Video Processor
-A smart and lightweight Flask web application that lets you:
+# 📁 Smart File & Video Processor
 
-🔄 Convert file formats (PDF ↔️ DOCX, PNG ↔️ JPG, etc.)
+A smart and lightweight **Flask web application** that allows users to:
+- 🔄 Convert file formats (PDF ↔️ DOCX, PNG ↔️ JPG, etc.)
+- 🎬 Upload videos and automatically generate **captions/subtitles** using AI-based speech recognition
 
-🎬 Upload videos and automatically generate captions/subtitles using AI-based speech recognition
+> 🚀 One platform, multiple utilities — fast, simple, and powerful.
 
-🚀 One platform, multiple utilities — fast, simple, and powerful.
+---
 
-🌟 Features
-✅ File Format Conversion
-Convert between document types like:
+## 🌟 Features
 
-.docx, .pdf, .png, .jpg, .txt
+✅ **File Format Conversion**  
+- Convert between `.docx`, `.pdf`, `.png`, `.jpg`, `.txt`, and more
 
-✅ Video Captioning
+✅ **Video Captioning**  
+- Upload video files (`.mp4`, `.mov`, etc.)
+- Automatically extract and transcribe audio into subtitles using speech recognition
 
-Upload a video file (.mp4, .mov, etc.)
+✅ **Multi-File Upload Support**  
+✅ **Clean UI with Instant Feedback**  
+✅ **Offline & Privacy-Friendly** – Runs locally without needing external APIs
 
-Audio is extracted and converted to text using speech recognition
+---
 
-Captions are displayed instantly or downloadable
+## 🛠️ Tech Stack
 
-✅ Multi-File Upload Support
-✅ Clean UI with Instant Feedback
-✅ No External API Required – Fully works offline (locally)
+**Frontend**:
+- HTML, CSS (Jinja2 templating)
 
-🛠️ Tech Stack
-Frontend:
+**Backend**:
+- Python (Flask)
 
-HTML, CSS (Jinja2 templates)
+**Libraries Used**:
+- `moviepy` – For audio/video processing  
+- `speech_recognition` – For speech-to-text  
+- `PyDub` – Audio format handling  
+- `PyPDF2`, `python-docx`, `Pillow` – File conversions
 
-Backend:
+---
 
-Python Flask
+## 🚀 How to Run Locally
 
-Libraries Used:
-
-moviepy – Video and audio processing
-
-speech_recognition – Speech-to-text conversion
-
-PyDub – Audio format conversion
-
-python-docx, PyPDF2, Pillow – File manipulation
-
-🚀 How to Run Locally
-Clone the Repository
-
-bash
-Copy
-Edit
+```bash
+# 1. Clone the Repository
 git clone https://github.com/MohammedRayan11/SmartFileVideoProcessor.git
 cd SmartFileVideoProcessor
-Create a Virtual Environment
 
-bash
-Copy
-Edit
+# 2. Create a Virtual Environment
 python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-Install Dependencies
+# Activate the virtual environment
+# Windows:
+venv\Scripts\activate
+# Linux/Mac:
+source venv/bin/activate
 
-bash
-Copy
-Edit
+# 3. Install Required Packages
 pip install -r requirements.txt
-Run the App
 
-bash
-Copy
-Edit
+# 4. Run the Flask App
 python app.py
-Open in browser:
-http://127.0.0.1:5000
+```
 
-📂 Folder Structure
-cpp
-Copy
-Edit
+Open your browser and go to: [http://127.0.0.1:5000](http://127.0.0.1:5000)
+
+---
+
+## 📁 Folder Structure
+
+```
+SmartFileVideoProcessor/
+├── app.py
+├── requirements.txt
 ├── static/
 │   └── style.css
 ├── templates/
 │   ├── index.html
 │   ├── result.html
 ├── uploads/
-├── app.py
-├── requirements.txt
 └── README.md
-🎯 Use Cases
-✅ Students converting and submitting files in correct formats
+```
 
-✅ Content creators auto-generating captions for their videos
+---
 
-✅ Professionals managing documents and media from one tool
+## 💡 Use Cases
 
-🤝 Contributing
-Pull requests are welcome! If you’d like to add features (like real-time caption download or support for more formats), feel free to fork and collaborate.
+- 🎓 Students converting and submitting assignments
+- 📹 Content creators generating captions for videos
+- 🧑‍💼 Professionals managing various file types with ease
 
-📄 License
-This project is open-source and available under the MIT License.
+---
+
+## 🤝 Contributing
+
+Pull requests are welcome! Feel free to fork this repo and submit improvements or additional features like:
+- 📄 Real-time downloadable subtitle files
+- 📁 Support for more formats (e.g., `.xlsx`, `.pptx`)
+- 🖼️ Drag and drop UI enhancements
+
+---
+
+## 📄 License
+
+This project is licensed under the [MIT License](LICENSE).
+
+---
+
+> Developed with 💻 and 🔥 by Mohammed Rayan  
+> Let’s simplify file processing with intelligence.
+
